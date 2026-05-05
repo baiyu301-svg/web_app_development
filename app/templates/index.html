@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row align-items-center mb-5">
+    <div class="col-lg-6">
+        <h1 class="display-4 fw-bold mb-4">告別抽籤噩夢<br><span style="color: var(--primary-color);">精準換到理想課程</span></h1>
+        <p class="lead mb-4 opacity-75">全台首創大學選課自動媒合平台，讓多方交換不再是神話。安全、匿名、高效率。</p>
+        {% if not session.get('user_id') %}
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill">立即開始</a>
+        {% else %}
+            <a href="{{ url_for('course.wishlist') }}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill">前往許願清單</a>
+        {% endif %}
+    </div>
+    <div class="col-lg-6 d-none d-lg-block text-center">
+        <!-- 裝飾用的玻璃質感區塊 -->
+        <div class="glass-card p-5" style="border-radius: 50%; width: 400px; height: 400px; margin: 0 auto; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, rgba(59,130,246,0.2) 0%, rgba(255,255,255,0.05) 100%);">
+            <h2 class="display-1">🔄</h2>
+        </div>
+    </div>
+</div>
+
+<h2 class="h3 mb-4 text-center mt-5">目前平台提供媒合的課程總覽</h2>
+<div class="row g-4">
+    {% for course in courses %}
+    <div class="col-md-6 col-lg-4">
+        <div class="glass-card h-100 p-4">
+            <h5 class="fw-bold">{{ course.name }}</h5>
+            <div class="text-muted small mb-3">
+                <span>{{ course.course_code }}</span> | <span>{{ course.department }}</span>
+            </div>
+            <p class="mb-1"><strong>教授：</strong> {{ course.instructor }}</p>
+            <p class="mb-0"><strong>學分：</strong> <span class="badge bg-primary rounded-pill">{{ course.credits }}</span></p>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center text-muted">
+        目前平台尚未匯入任何課程。
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

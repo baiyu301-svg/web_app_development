@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-md-6 col-lg-5">
+        <div class="glass-card p-5">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold">註冊</h2>
+                <p class="text-muted">加入平台，輕鬆交換課程</p>
+            </div>
+            
+            <form action="{{ url_for('auth.register') }}" method="POST">
+                <div class="mb-4">
+                    <label for="email" class="form-label text-muted small text-uppercase fw-bold">學校信箱 (.edu.tw)</label>
+                    <input type="email" class="form-control form-control-lg" id="email" name="email" placeholder="學號@o365.xxx.edu.tw" required>
+                    <div class="form-text text-muted mt-2" style="font-size: 0.8rem;">為保障交易安全，僅限使用 .edu.tw 結尾的學校信箱。</div>
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="form-label text-muted small text-uppercase fw-bold">設定密碼</label>
+                    <input type="password" class="form-control form-control-lg" id="password" name="password" placeholder="至少 8 個字元" required minlength="8">
+                </div>
+                <div class="d-grid mt-5">
+                    <button type="submit" class="btn btn-primary btn-lg rounded-pill">建立帳號</button>
+                </div>
+            </form>
+            
+            <div class="text-center mt-4">
+                <p class="mb-0 text-muted">已經有帳號了？ <a href="{{ url_for('auth.login') }}" class="text-primary fw-bold text-decoration-none">登入</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

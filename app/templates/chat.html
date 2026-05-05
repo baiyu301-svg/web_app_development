@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="d-flex align-items-center mb-4">
+            <a href="{{ url_for('chat.matches') }}" class="btn btn-sm btn-outline-light rounded-circle me-3" style="width: 36px; height: 36px;">&larr;</a>
+            <h2 class="fw-bold mb-0">匿名聊天室</h2>
+        </div>
+
+        <div class="glass-card p-0 overflow-hidden d-flex flex-column" style="height: 70vh;">
+            <!-- 聊天室頭部資訊 -->
+            <div class="p-3" style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--glass-border);">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="badge bg-secondary mb-1">配對編號 #{{ match.id }}</span>
+                        <p class="mb-0 small text-muted">請在此與對方約定選課系統離峰時段，同步執行退加選。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 訊息顯示區塊 -->
+            <div class="chat-container flex-grow-1 p-4" id="chatContainer" style="overflow-y: auto; background: transparent; border: none; height: auto;">
+                {% for msg in messages %}
+                    {% if msg.is_mine %}
+                        <div class="chat-bubble mine">
+                            <p class="mb-1">{{ msg.content }}</p>
+                            <small class="text-white-50" style="font-size: 0.7rem;">{{ msg.created_at[11:16] }}</small>
+                        </div>
+                    {% else %}
+                        <div class="chat-bubble theirs">
+                            <p class="mb-1">{{ msg.content }}</p>
+                            <small class="text-muted" style="font-size: 0.7rem;">{{ msg.created_at[11:16] }}</small>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center text-muted mt-5">
+                        <p>目前還沒有任何對話。先打個招呼吧！</p>
+                        <small>請勿提供過多真實個資，以防詐騙或放鳥。</small>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- 輸入區塊 -->
+            <div class="p-3" style="background: rgba(0,0,0,0.3); border-top: 1px solid var(--glass-border);">
+                {% if match.status == 'chatting' %}
+                <form action="{{ url_for('chat.send_message', match_id=match.id) }}" method="POST" class="d-flex gap-2">
+                    <input type="text" name="content" class="form-control rounded-pill bg-dark text-light border-secondary" placeholder="輸入訊息..." required autocomplete="off">
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">傳送</button>
+                </form>
+                {% else %}
+                <div class="text-center text-muted py-2">
+                    此交易已結束，無法繼續發送訊息。
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 自動捲動到最底部
+    const chatContainer = document.getElementById('chatContainer');
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+</script>
+{% endblock %}

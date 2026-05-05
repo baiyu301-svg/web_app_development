@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4 align-items-end">
+    <div class="col-md-8">
+        <h2 class="fw-bold mb-1">我的許願清單</h2>
+        <p class="text-muted mb-0">管理您的換課願望，系統會在背景為您尋找適合的對象。</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 左側：新增願望表單 -->
+    <div class="col-lg-4 mb-4 mb-lg-0">
+        <div class="glass-card h-100">
+            <h5 class="fw-bold mb-4">新增換課願望</h5>
+            <form action="{{ url_for('course.add_wishlist') }}" method="POST">
+                <div class="mb-4">
+                    <label for="held_course_id" class="form-label text-muted small fw-bold">我想換出 (擁有的課程)</label>
+                    <select class="form-select form-select-lg" id="held_course_id" name="held_course_id" required>
+                        <option value="" selected disabled>請選擇...</option>
+                        {% for c in courses %}
+                            <option value="{{ c.id }}">{{ c.name }} ({{ c.instructor }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="text-center mb-4">
+                    <span class="badge bg-secondary p-2 rounded-circle" style="background: var(--glass-bg) !important; border: 1px solid var(--glass-border);">⬇️</span>
+                </div>
+
+                <div class="mb-4">
+                    <label for="target_course_id" class="form-label text-muted small fw-bold">我想換入 (目標課程)</label>
+                    <select class="form-select form-select-lg" id="target_course_id" name="target_course_id" required>
+                        <option value="" selected disabled>請選擇...</option>
+                        {% for c in courses %}
+                            <option value="{{ c.id }}">{{ c.name }} ({{ c.instructor }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary rounded-pill py-2">送出願望</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 右側：目前的許願清單列表 -->
+    <div class="col-lg-8">
+        <div class="glass-card h-100">
+            <h5 class="fw-bold mb-4">目前狀態</h5>
+            <div class="table-responsive">
+                <table class="table table-dark table-hover table-borderless" style="background: transparent;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--glass-border);">
+                            <th class="text-muted fw-normal py-3">換出</th>
+                            <th class="text-muted fw-normal py-3">換入</th>
+                            <th class="text-muted fw-normal py-3">狀態</th>
+                            <th class="text-muted fw-normal py-3 text-end">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for w in wishlists %}
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td class="py-3 align-middle">{{ w.held_course.name if w.held_course else '未知' }}</td>
+                            <td class="py-3 align-middle">{{ w.target_course.name if w.target_course else '未知' }}</td>
+                            <td class="py-3 align-middle">
+                                {% if w.status == 'pending' %}
+                                    <span class="badge bg-secondary">尋找中</span>
+                                {% elif w.status == 'matched' %}
+                                    <span class="badge bg-success">已配對</span>
+                                {% else %}
+                                    <span class="badge bg-light text-dark">{{ w.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 align-middle text-end">
+                                <form action="{{ url_for('course.delete_wishlist', id=w.id) }}" method="POST" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-light rounded-pill px-3" onclick="return confirm('確定要刪除這個願望嗎？');">刪除</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                尚未新增任何願望清單。
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

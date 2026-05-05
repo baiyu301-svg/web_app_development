@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4 align-items-end">
+    <div class="col-md-8">
+        <h2 class="fw-bold mb-1">媒合列表</h2>
+        <p class="text-muted mb-0">恭喜！系統為您找到了合適的換課對象，請盡快與對方聯絡。</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    {% for match in matches %}
+    <div class="col-md-6 col-lg-4">
+        <div class="glass-card h-100 p-4 position-relative">
+            {% if match.status == 'chatting' %}
+                <span class="position-absolute top-0 start-100 translate-middle p-2 bg-success border border-light rounded-circle">
+                    <span class="visually-hidden">New alerts</span>
+                </span>
+            {% endif %}
+            
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="badge {{ 'bg-primary' if match.status == 'chatting' else 'bg-secondary' }}">
+                    {{ '可聯絡' if match.status == 'chatting' else match.status }}
+                </span>
+                <small class="text-muted">{{ match.created_at[:10] }}</small>
+            </div>
+            
+            <div class="mb-4 text-center">
+                <div class="p-3 rounded" style="background: rgba(0,0,0,0.2);">
+                    <small class="text-muted d-block mb-1">您將獲得</small>
+                    <h5 class="fw-bold text-success mb-0">{{ match.get_course.name if match.get_course else '未知' }}</h5>
+                </div>
+                <div class="my-2">⬆️⬇️</div>
+                <div class="p-3 rounded" style="background: rgba(0,0,0,0.2);">
+                    <small class="text-muted d-block mb-1">您將給出</small>
+                    <h5 class="fw-bold text-danger mb-0">{{ match.give_course.name if match.give_course else '未知' }}</h5>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2">
+                <a href="{{ url_for('chat.chat_room', match_id=match.id) }}" class="btn btn-outline-light rounded-pill">進入匿名聊天室</a>
+                
+                {% if match.status == 'chatting' %}
+                <!-- 評價對手，象徵交易完成 -->
+                <button type="button" class="btn btn-sm btn-link text-muted text-decoration-none mt-2" data-bs-toggle="modal" data-bs-target="#rateModal{{ match.id }}">
+                    完成交易並評價
+                </button>
+                
+                <!-- 評價 Modal -->
+                <div class="modal fade" id="rateModal{{ match.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content glass-card" style="background: var(--bg-color);">
+                            <div class="modal-header border-0">
+                                <h5 class="modal-title fw-bold">給予評價</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form action="{{ url_for('course.rate_user', match_id=match.id) }}" method="POST">
+                                <div class="modal-body">
+                                    <p class="text-muted">換課是否順利？您的評價將影響對方的信用分數。</p>
+                                    <div class="d-flex justify-content-center gap-3 my-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="rating" id="good{{ match.id }}" value="good" required>
+                                            <label class="form-check-label text-success fw-bold fs-5" for="good{{ match.id }}">👍 順利完成</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="rating" id="bad{{ match.id }}" value="bad">
+                                            <label class="form-check-label text-danger fw-bold fs-5" for="bad{{ match.id }}">👎 被放鳥</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer border-0">
+                                    <button type="submit" class="btn btn-primary rounded-pill px-4">送出評價</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-5 glass-card">
+        <h4 class="text-muted mb-3">目前還沒有媒合成功的紀錄</h4>
+        <p class="text-muted mb-4">去新增更多許願清單，增加配對成功率吧！</p>
+        <a href="{{ url_for('course.wishlist') }}" class="btn btn-outline-light rounded-pill px-4">前往許願清單</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
